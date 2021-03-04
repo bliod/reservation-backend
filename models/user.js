@@ -11,9 +11,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  reservationDate: {
+  reservations: {
     type: Date,
     required: true,
+    unique: true,
   },
 });
 
