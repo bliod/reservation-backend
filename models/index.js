@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 mongoose.set("debug", true);
 mongoose.Promise = Promise;
-mongoose.connect("mongodb://localhost/reseration", {
+mongoose.connect("mongodb://localhost/reservations", {
   keepAlive: true,
 });
 

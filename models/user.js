@@ -4,15 +4,13 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    unique: true,
   },
   surname: {
     type: String,
     required: true,
-    unique: true,
   },
   reservations: {
-    type: Date,
+    type: [Date],
     required: true,
     unique: true,
   },
