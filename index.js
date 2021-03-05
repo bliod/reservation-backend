@@ -7,38 +7,12 @@ const errorHandler = require("./handlers/error");
 const User = require("./models/user");
 const PORT = 8081;
 
-// parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded());
 
-// parse application/json
 app.use(bodyParser.json());
 app.use(cors());
 
-// app.get("/", async (req, res) => {
-//   try {
-//     // let user = await db.User.create({
-//     //   name: "Karolis",
-//     //   surname: "Bliodnieks",
-//     //   reservations: new Date(),
-//     // });
-//     // let usera = await db.User.create({
-//     //   name: "Karolis1",
-//     //   surname: "Bliodnieks2",
-//     //   reservations: new Date(),
-//     // });
-//     let user = await db.User.create({
-//       name: "Karolis2",
-//       surname: "Bliodnieks1",
-//       reservations: new Date(),
-//     });
-//     // let reservation = await db.Reservation.create({
-//     //   bookedDates: "date",
-//     // });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// });
-
+//define function to get dates week number
 Date.prototype.getWeek = function () {
   var onejan = new Date(this.getFullYear(), 0, 1);
   var today = new Date(this.getFullYear(), this.getMonth(), this.getDate());
@@ -102,10 +76,6 @@ app.post("/rest/v1/reservation/create", async (req, res, next) => {
     next(error);
     // throw new Error(error);
   }
-});
-
-app.get("/error", (req, res) => {
-  chicken.thro();
 });
 
 app.use(function (req, res, next) {
