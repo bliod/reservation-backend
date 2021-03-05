@@ -14,37 +14,46 @@ app.use(bodyParser.urlencoded());
 app.use(bodyParser.json());
 app.use(cors());
 
-app.get("/", async (req, res) => {
-  try {
-    // let user = await db.User.create({
-    //   name: "Karolis",
-    //   surname: "Bliodnieks",
-    //   reservations: new Date(),
-    // });
-    // let usera = await db.User.create({
-    //   name: "Karolis1",
-    //   surname: "Bliodnieks2",
-    //   reservations: new Date(),
-    // });
-    let useraq = await db.User.create({
-      name: "Karolis2",
-      surname: "Bliodnieks1",
-      reservations: new Date(),
-    });
-    // let reservation = await db.Reservation.create({
-    //   bookedDates: "date",
-    // });
-  } catch (error) {
-    console.log(error);
-  }
-});
+// app.get("/", async (req, res) => {
+//   try {
+//     // let user = await db.User.create({
+//     //   name: "Karolis",
+//     //   surname: "Bliodnieks",
+//     //   reservations: new Date(),
+//     // });
+//     // let usera = await db.User.create({
+//     //   name: "Karolis1",
+//     //   surname: "Bliodnieks2",
+//     //   reservations: new Date(),
+//     // });
+//     let user = await db.User.create({
+//       name: "Karolis2",
+//       surname: "Bliodnieks1",
+//       reservations: new Date(),
+//     });
+//     // let reservation = await db.Reservation.create({
+//     //   bookedDates: "date",
+//     // });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// });
+
+Date.prototype.getWeek = function () {
+  var onejan = new Date(this.getFullYear(), 0, 1);
+  var today = new Date(this.getFullYear(), this.getMonth(), this.getDate());
+  var dayOfYear = (today - onejan + 86400000) / 86400000;
+  return Math.ceil(dayOfYear / 7);
+};
 
 app.get("/rest/v1/reservation", async (req, res) => {
-  const arr = await User.find().distinct("reservations");
-
-  console.log(arr);
-
-  res.json(arr);
+  try {
+    const allReservations = await User.find().distinct("reservations");
+    res.status(200);
+    res.json(allReservations);
+  } catch (error) {
+    next(error);
+  }
 });
 
 app.post("/rest/v1/reservation/create", async (req, res, next) => {
@@ -56,18 +65,29 @@ app.post("/rest/v1/reservation/create", async (req, res, next) => {
       surname: data.surname,
     });
     console.log(isUserExist, "user");
+
     if (isUserExist.length > 0) {
-      if (isUserExist[0].reservations.length < 2) {
-        let user = await db.User.updateOne(
-          {
-            name: data.name,
-            surname: data.surname,
-          },
-          { $push: { reservations: data.date } }
+      const reservations = isUserExist[0].reservations;
+      const weeks = reservations.map((el) => el.getWeek());
+      let reqWeek = new Date(data.date).getWeek();
+
+      console.log(reqWeek, "this week");
+      console.log(reservations, "res");
+      console.log(weeks, "week");
+
+      let isSameWeek = weeks.some((el) => el === reqWeek);
+      if (isSameWeek) {
+        throw new Error(
+          "Sorry, you already have reservation this week. Please select other week"
         );
-      } else {
-        throw new Error("you can only have 2");
       }
+      let user = await db.User.updateOne(
+        {
+          name: data.name,
+          surname: data.surname,
+        },
+        { $push: { reservations: data.date } }
+      );
     } else {
       let user = await db.User.create({
         name: data.name,
@@ -75,25 +95,26 @@ app.post("/rest/v1/reservation/create", async (req, res, next) => {
         reservations: data.date,
       });
     }
+    res.status(201);
+    res.json("User created!");
   } catch (error) {
     console.log(error);
+    next(error);
+    // throw new Error(error);
   }
-
-  res.status(201);
-  res.json("valio!");
 });
 
 app.get("/error", (req, res) => {
   chicken.thro();
 });
 
-// app.use(function (req, res, next) {
-//   let err = new Error("Not Found");
-//   err.status = 404;
-//   next(err);
-// });
+app.use(function (req, res, next) {
+  let err = new Error("Not Found");
+  err.status = 404;
+  next(err);
+});
 
-// app.use(errorHandler);
+app.use(errorHandler);
 
 app.listen(PORT, function () {
   console.log(`Server is starting on port ${PORT}`);
