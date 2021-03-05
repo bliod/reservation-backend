@@ -70,7 +70,7 @@ app.post("/rest/v1/reservation/create", async (req, res, next) => {
       });
     }
     res.status(201);
-    res.json("User created!");
+    res.json("Reservation comfirmed!");
   } catch (error) {
     console.log(error);
     next(error);

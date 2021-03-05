@@ -6,4 +6,3 @@ mongoose.connect("mongodb://localhost/reservations", {
 });
 
 module.exports.User = require("./user");
-module.exports.Reservations = require("./reservations");
