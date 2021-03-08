@@ -8,7 +8,6 @@ const User = require("./models/user");
 const PORT = 8081;
 
 app.use(bodyParser.urlencoded());
-
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -31,24 +30,17 @@ app.get("/rest/v1/reservation", async (req, res) => {
 });
 
 app.post("/rest/v1/reservation/create", async (req, res, next) => {
-  console.log(req.body);
   const data = req.body;
   try {
     const isUserExist = await User.find({
       name: data.name,
       surname: data.surname,
     });
-    console.log(isUserExist, "user");
 
     if (isUserExist.length > 0) {
       const reservations = isUserExist[0].reservations;
       const weeks = reservations.map((el) => el.getWeek());
       let reqWeek = new Date(data.date).getWeek();
-
-      console.log(reqWeek, "this week");
-      console.log(reservations, "res");
-      console.log(weeks, "week");
-
       let isSameWeek = weeks.some((el) => el === reqWeek);
       if (isSameWeek) {
         throw new Error(
@@ -74,7 +66,6 @@ app.post("/rest/v1/reservation/create", async (req, res, next) => {
   } catch (error) {
     console.log(error);
     next(error);
-    // throw new Error(error);
   }
 });
 
